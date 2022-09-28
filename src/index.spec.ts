@@ -2,6 +2,6 @@ import { sum } from './index'
 
 describe('test',() => {
   it('test',() => {
-    expect(sum(1,1)).toBe(2)
+    expect(sum(2,2)).toBe(4)
   })
 })
