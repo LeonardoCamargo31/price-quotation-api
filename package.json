@@ -9,7 +9,8 @@
     "test:unit": "npm test -- --watch -c jest-unit.config.js",
     "test:integration": "npm test -- --watch -c jest-integration.config.js",
     "test:staged": "npm test -- --findRelatedTests --forceExit",
-    "test:ci": "npm test -- --coverage --forceExit"
+    "test:ci": "npm test -- --coverage --forceExit",
+    "dev": "nodemon src/server.ts"
   },
   "keywords": [],
   "author": "",
