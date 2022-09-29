@@ -36,8 +36,8 @@ export class SearchController {
       }
 
       const dataRequest = {
-        checkin: '2022-11-26T00:00:00',
-        checkout: '2022-11-30T00:00:00',
+        checkin,
+        checkout,
         adults: '2',
         destiny: 'Pratagy+Beach+Resort+All+Inclusive',
         hotelCode: '12'

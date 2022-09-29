@@ -4,8 +4,8 @@ import { DataRequest, DataResponse, ISearchService } from '../../service/SearchS
 import { SearchController } from './SearchController'
 
 const validData = {
-  checkin: '2022-09-29',
-  checkout: '2022-09-29'
+  checkin: '2022-11-26',
+  checkout: '2022-11-30'
 }
 
 interface sutTypes {
@@ -60,8 +60,8 @@ describe('Search Router', () => {
       expect(spySearchService).toBeCalledTimes(1)
       expect(spySearchService).toBeCalledWith(
         expect.objectContaining({
-          checkin: '2022-11-26T00:00:00',
-          checkout: '2022-11-30T00:00:00',
+          checkin: '2022-11-26',
+          checkout: '2022-11-30',
           adults: '2',
           destiny: 'Pratagy+Beach+Resort+All+Inclusive',
           hotelCode: '12'

@@ -19,33 +19,42 @@ export type DataResponse = {
   image: string
 }
 
+type DataCookie = {
+  name: string
+  value: string
+  domain: string
+}
+
 export class SearchService {
+  private readonly domain = 'pratagy.letsbook.com.br'
+
+  private createCookie (dataRequest: DataRequest): DataCookie {
+    const cookieValue = JSON.stringify([{
+      Chegada: dataRequest.checkin,
+      Partida: dataRequest.checkout,
+      CodigoHotel: dataRequest.hotelCode,
+      Adultos: dataRequest.adults,
+      Destino: dataRequest.destiny
+    }])
+
+    const cookie = {
+      name: 'PRATAGY-PMW-SEARCHES',
+      value: cookieValue,
+      domain: this.domain
+    }
+
+    return cookie
+  }
+
   async handler (dataRequest: DataRequest): Promise<DataResponse[]> {
     try {
-      const domain = 'pratagy.letsbook.com.br'
-      const url = `https://${domain}/D/Reserva/ConsultaDisponibilidade`
-      const checkin = dataRequest.checkin
-      const checkout = dataRequest.checkout
-      const adults = dataRequest.adults
-      const destiny = dataRequest.destiny
-      const hotelCode = dataRequest.hotelCode
+      const url = `https://${this.domain}/D/Reserva/ConsultaDisponibilidade`
+      const { checkin, checkout, adults, destiny, hotelCode } = dataRequest
 
       const browser = await puppeteer.launch()
       const page = await browser.newPage()
-
-      const cookieValue = JSON.stringify([{
-        Chegada: checkin,
-        Partida: checkout,
-        CodigoHotel: hotelCode,
-        Adultos: adults,
-        Destino: destiny
-      }])
-
-      await page.setCookie({
-        name: 'PRATAGY-PMW-SEARCHES',
-        value: cookieValue,
-        domain: domain
-      })
+      const cookie = this.createCookie(dataRequest)
+      await page.setCookie(cookie)
 
       await page.goto(`${url}?checkin=${checkin}&checkout=${checkout}&hotel=${hotelCode}&adultos=${adults}&destino=${destiny}`)
 
