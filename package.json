@@ -17,7 +17,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "puppeteer": "^18.0.5"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",
