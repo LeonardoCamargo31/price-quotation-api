@@ -1,9 +1,9 @@
 import puppeteer from 'puppeteer'
 
 export interface ISearchService {
-  page: puppeteer.Page
+  page?: puppeteer.Page
   handler: (dataRequest: DataRequest) => Promise<DataResponse[]>
-  accessPage: (request: string) => Promise<void>
+  accessPage?: (request: string) => Promise<void>
 }
 
 export type DataRequest = {
