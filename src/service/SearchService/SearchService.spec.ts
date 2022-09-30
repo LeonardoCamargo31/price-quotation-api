@@ -35,4 +35,26 @@ describe('Search Service',() => {
     expect(response.length).toBe(8)
     expect(spyAccessPage).toBeCalledTimes(1)
   })
+
+  it('should throw a new error', async () => {
+    const { sut } = makeSut()
+
+    const dataRequest = {
+      checkin: '2022-11-26',
+      checkout: '2022-11-30',
+      adults: '2',
+      destiny: 'test-only',
+      hotelCode: '12'
+    }
+
+    jest.spyOn(sut, 'accessPage')
+      .mockImplementationOnce(async () => {
+        return new Promise((resolve, reject) => reject(new Error('any_message')))
+      })
+
+    const promise = sut.handler(dataRequest)
+    await expect(promise).rejects.toThrow(
+      new Error('Error: any_message')
+    )
+  })
 })
