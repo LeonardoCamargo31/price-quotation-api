@@ -1,5 +1,7 @@
 # Price quotation API
 
+![Tests](https://github.com/LeonardoCamargo31/price-quotation-api/workflows/Tests/badge.svg)
+
 ## Índice
 - [Sobre](#-sobre)
 - [Pré-requisitos](#-pré-requisitos)
