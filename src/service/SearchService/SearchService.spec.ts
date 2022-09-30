@@ -27,12 +27,8 @@ describe('Search Service',() => {
 
     const spyAccessPage = jest.spyOn(sut, 'accessPage')
       .mockImplementationOnce(async () => {
-        // eslint-disable-next-line no-async-promise-executor
-        return new Promise(async (resolve, reject) => {
-          const contents = fileSystem.readFileSync(path.join(__dirname, './test.html'))
-          await sut.page.setContent(contents.toString())
-          resolve()
-        })
+        const contents = fileSystem.readFileSync(path.join(__dirname, './test.html'))
+        await sut.page.setContent(contents.toString())
       })
 
     const response = await sut.handler(dataRequest)
