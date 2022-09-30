@@ -93,7 +93,24 @@ describe('Search Router', () => {
   })
 
   describe('bad request', () => {
-    test('should return status code 400, if invalid checkin', async () => {
+    test('should return status code 400, if checkin field has an invalid date', async () => {
+      const { sut } = makeSut()
+      const agent = request.agent(sut)
+
+      await agent
+        .post('/search')
+        .send({
+          ...validData,
+          checkin: '2022-05-32'
+        })
+        .expect(400)
+        .then(res => {
+          expect(res.body.error.errorDetail.checkin[0]).toBe('date.isoDate')
+          expect(res.body.error.errorFields[0]).toBe('checkin')
+        })
+    })
+
+    test('should return status code 400, if checkin field is with invalid date format', async () => {
       const { sut } = makeSut()
       const agent = request.agent(sut)
 
@@ -105,7 +122,7 @@ describe('Search Router', () => {
         })
         .expect(400)
         .then(res => {
-          expect(res.body.error.errorDetail.checkin[0]).toBe('string.regex.base')
+          expect(res.body.error.errorDetail.checkin[0]).toBe('date.isoDate')
           expect(res.body.error.errorFields[0]).toBe('checkin')
         })
     })
@@ -127,7 +144,7 @@ describe('Search Router', () => {
         })
     })
 
-    test('should return status code 400, if invalid checkout', async () => {
+    test('should return status code 400, if checkout field is with invalid date format', async () => {
       const { sut } = makeSut()
       const agent = request.agent(sut)
 
@@ -139,7 +156,7 @@ describe('Search Router', () => {
         })
         .expect(400)
         .then(res => {
-          expect(res.body.error.errorDetail.checkout[0]).toBe('string.regex.base')
+          expect(res.body.error.errorDetail.checkout[0]).toBe('date.isoDate')
           expect(res.body.error.errorFields[0]).toBe('checkout')
         })
     })
