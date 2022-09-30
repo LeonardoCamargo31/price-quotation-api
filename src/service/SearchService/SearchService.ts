@@ -1,9 +1,9 @@
 import puppeteer from 'puppeteer'
-import path from 'path'
-import fileSystem from 'fs'
 
 export interface ISearchService {
+  page?: puppeteer.Page
   handler: (dataRequest: DataRequest) => Promise<DataResponse[]>
+  accessPage?: (request: string) => Promise<void>
 }
 
 export type DataRequest = {
@@ -29,6 +29,7 @@ type DataCookie = {
 
 export class SearchService {
   private readonly domain = 'pratagy.letsbook.com.br'
+  public page: puppeteer.Page
 
   private createCookie (dataRequest: DataRequest): DataCookie {
     const cookieValue = JSON.stringify([{
@@ -65,9 +66,20 @@ export class SearchService {
     return results
   }
 
-  private async getPage (): Promise<puppeteer.Page> {
-    const browser = await puppeteer.launch()
+  private async getBrowser (): Promise<puppeteer.Browser> {
+    return await puppeteer.launch()
+  }
+
+  private async closeBrowser (browser: puppeteer.Browser): Promise<void> {
+    await browser.close()
+  }
+
+  private async getNewPage (browser: puppeteer.Browser): Promise<puppeteer.Page> {
     return await browser.newPage()
+  }
+
+  async accessPage (request: string): Promise<void> {
+    await this.page.goto(request)
   }
 
   async handler (dataRequest: DataRequest): Promise<DataResponse[]> {
@@ -76,18 +88,22 @@ export class SearchService {
       const { checkin, checkout, adults, destiny, hotelCode } = dataRequest
       const request = `${url}?checkin=${checkin}&checkout=${checkout}&hotel=${hotelCode}&adultos=${adults}&destino=${destiny}`
 
+      const browser = await this.getBrowser()
       const cookie = this.createCookie(dataRequest)
-      const page = await this.getPage()
-      await page.setCookie(cookie)
+      this.page = await this.getNewPage(browser)
+      await this.page.setRequestInterception(true)
+      await this.page.setCookie(cookie)
 
-      if (process.env.NODE_ENV === 'test') {
-        const contents = fileSystem.readFileSync(path.join(__dirname, './test.html'))
-        await page.setContent(contents.toString())
-      } else {
-        await page.goto(request)
-      }
+      this.page.on('request', async request => {
+        if (request.url().includes(this.domain)) {
+          console.log(`Request in URL: ${request.url()}`)
+        }
+        await request.continue()
+      })
 
-      const retult = await page.evaluate(this.getPageData)
+      await this.accessPage(request)
+      const retult = await this.page.evaluate(this.getPageData)
+      await this.closeBrowser(browser)
       return retult
     } catch (error) {
       throw new Error(error)

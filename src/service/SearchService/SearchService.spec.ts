@@ -1,4 +1,6 @@
 import { SearchService, ISearchService } from './SearchService'
+import path from 'path'
+import fileSystem from 'fs'
 
 interface sutTypes {
   sut: ISearchService
@@ -23,7 +25,18 @@ describe('Search Service',() => {
       hotelCode: '12'
     }
 
+    const spyAccessPage = jest.spyOn(sut, 'accessPage')
+      .mockImplementationOnce(async () => {
+        // eslint-disable-next-line no-async-promise-executor
+        return new Promise(async (resolve, reject) => {
+          const contents = fileSystem.readFileSync(path.join(__dirname, './test.html'))
+          await sut.page.setContent(contents.toString())
+          resolve()
+        })
+      })
+
     const response = await sut.handler(dataRequest)
     expect(response.length).toBe(8)
+    expect(spyAccessPage).toBeCalledTimes(1)
   })
 })
