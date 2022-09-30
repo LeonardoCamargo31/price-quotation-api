@@ -1,4 +1,6 @@
 import puppeteer from 'puppeteer'
+import path from 'path'
+import fileSystem from 'fs'
 
 export interface ISearchService {
   handler: (dataRequest: DataRequest) => Promise<DataResponse[]>
@@ -46,35 +48,47 @@ export class SearchService {
     return cookie
   }
 
+  private getPageData (): DataResponse[] {
+    const results: DataResponse[] = []
+    const items = document.querySelectorAll('tr.row-quarto')
+
+    items.forEach((item) => {
+      const elemImage = item.querySelector('.tdQuarto ul li')
+      const styleImage = getComputedStyle(elemImage)
+      results.push({
+        name: item.querySelector('span.quartoNome').innerHTML,
+        description: item.querySelector('.quartoDescricao>p').innerHTML,
+        price: item.querySelector('span.valorFinal').innerHTML,
+        image: styleImage.backgroundImage.slice(4, -1).replace(/"/g, '')
+      })
+    })
+    return results
+  }
+
+  private async getPage (): Promise<puppeteer.Page> {
+    const browser = await puppeteer.launch()
+    return await browser.newPage()
+  }
+
   async handler (dataRequest: DataRequest): Promise<DataResponse[]> {
     try {
       const url = `https://${this.domain}/D/Reserva/ConsultaDisponibilidade`
       const { checkin, checkout, adults, destiny, hotelCode } = dataRequest
+      const request = `${url}?checkin=${checkin}&checkout=${checkout}&hotel=${hotelCode}&adultos=${adults}&destino=${destiny}`
 
-      const browser = await puppeteer.launch()
-      const page = await browser.newPage()
       const cookie = this.createCookie(dataRequest)
+      const page = await this.getPage()
       await page.setCookie(cookie)
 
-      await page.goto(`${url}?checkin=${checkin}&checkout=${checkout}&hotel=${hotelCode}&adultos=${adults}&destino=${destiny}`)
+      if (process.env.NODE_ENV === 'test') {
+        const contents = fileSystem.readFileSync(path.join(__dirname, './test.html'))
+        await page.setContent(contents.toString())
+      } else {
+        await page.goto(request)
+      }
 
-      const content = await page.evaluate(() => {
-        const results = []
-        const items = document.querySelectorAll('tr.row-quarto')
-        items.forEach((item) => {
-          const elemImage = item.querySelector('.tdQuarto ul li')
-          const styleImage = getComputedStyle(elemImage)
-
-          results.push({
-            name: item.querySelector('span.quartoNome').innerHTML,
-            description: item.querySelector('.quartoDescricao>p').innerHTML,
-            price: item.querySelector('span.valorFinal').innerHTML,
-            image: styleImage.backgroundImage.slice(4, -1).replace(/"/g, '')
-          })
-        })
-        return results
-      })
-      return content
+      const retult = await page.evaluate(this.getPageData)
+      return retult
     } catch (error) {
       throw new Error(error)
     }

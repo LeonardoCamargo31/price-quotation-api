@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint 'src/**/*.ts' --fix",
-    "test": "jest --passWithNoTests --runInBand",
+    "test": "jest --silent --passWithNoTests --runInBand",
     "test:unit": "npm test -- --watch -c jest-unit.config.js",
     "test:integration": "npm test -- --watch -c jest-integration.config.js",
-    "test:staged": "npm test -- --findRelatedTests --forceExit",
+    "test:staged": "npm test -- --forceExit",
     "test:ci": "npm test -- --coverage --forceExit",
     "dev": "nodemon src/server.ts"
   },
@@ -37,6 +37,7 @@
     "git-commit-msg-linter": "^4.2.1",
     "husky": "^4.3.8",
     "jest": "^26.6.3",
+    "jest-puppeteer": "^6.1.1",
     "lint-staged": "^11.2.6",
     "nodemon": "^2.0.15",
     "supertest": "^4.0.2",

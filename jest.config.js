@@ -7,12 +7,14 @@ module.exports = {
     '!<rootDir>/src/server.ts',
     '!<rootDir>/src/interfaces/**/*.ts',
     '!<rootDir>/src/**/*.spec.ts',
-    '!<rootDir>/src/**/*.test.ts'
+    '!<rootDir>/src/**/*.test.ts',
+    '!<rootDir>/src/**/SearchService.ts'
   ],
   testTimeout: 60000,
   coverageDirectory: 'coverage',
   testEnvironment: 'node',
   transform: {
     '.+\\.ts$': 'ts-jest'
-  }
+  },
+  preset: "jest-puppeteer"
 }
